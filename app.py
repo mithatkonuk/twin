@@ -37,6 +37,6 @@ if __name__ == "__main__":
         chat,
         examples=EXAMPLES,
         title="Digital Twin ( Mithat Konuk )",
-        description="Talk to my AI twin about my career",
+        description="Hey there, I am Digital Twin of Mithat",
         chatbot=gr.Chatbot(show_label=False),
     ).launch(css=CSS, js=JS, theme=gr.themes.Base())
