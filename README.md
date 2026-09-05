@@ -1,44 +1,65 @@
 # twin
 
-A digital twin of my career — an AI chatbot that represents me on my personal website and answers visitor questions about my background, skills, and experience, in my voice.
+A config-driven personal site with an AI twin built in. One page — hero, about, career timeline, selected work, contact — plus a docked chat panel that answers visitor questions about my background in my voice.
 
-![Digital Twin chat interface](assets/screenshot.png)
+![The site, with the Digital Twin panel open](assets/screenshot.png)
+
+Everything the site shows, and every colour it uses, comes from a single file: [`profile.yaml`](profile.yaml). Swap that file and the site becomes someone else's — no Python to edit.
 
 ## How it works
 
-The app is a [Gradio](https://www.gradio.app/) chat UI backed by an LLM (via [OpenRouter](https://openrouter.ai/)). On startup it builds a system prompt from two sources of context about me:
+[`profile.yaml`](profile.yaml) is loaded and validated once at startup by [`profile.py`](profile.py) (pydantic). The resulting `Profile` object feeds three independent, pure modules:
 
-- [`summary.txt`](summary.txt) — a short, hand-written bio
-- [`linkedin.pdf`](linkedin.pdf) — my LinkedIn profile, exported as a PDF and parsed at runtime with `pypdf`
+```
+profile.yaml ──> profile.py ──> Profile
+                                  ├─> sections.py  → HTML per page section
+                                  ├─> theme.py     → stylesheet from the palette
+                                  └─> context.py   → the twin's system prompt
+```
 
-That context is assembled into `TWIN_SYSTEM_PROMPT` in [`context.py`](context.py), which instructs the model to:
+[`app.py`](app.py) assembles those into a `gr.Blocks` page and wires the chat callbacks. It is the only module that imports Gradio; `sections.py` and `theme.py` are pure functions with no I/O, so each is testable on its own.
 
-- stay in character as my digital twin and only discuss career/background/skills topics
-- ask for a visitor's email and record it (via a tool call) if they want to get in touch
-- record any question it couldn't answer, rather than making something up
+A section whose config is empty is not rendered at all — a profile with no `portfolio:` simply has no portfolio section.
 
-The model can call two tools, defined in [`tools.json`](tools.json) and validated/loaded by [`tool_loader.py`](tool_loader.py), and implemented in [`tools.py`](tools.py):
+### The twin
+
+The chat panel is backed by an LLM via [OpenRouter](https://openrouter.ai/). Its system prompt is built from whatever files are listed under `twin.sources`, so adding context is a config change:
+
+```yaml
+twin:
+  model: openrouter/free
+  sources:
+    - type: text
+      path: summary.txt
+    - type: pdf
+      path: linkedin.pdf
+```
+
+The model can call two tools, defined in [`tools.json`](tools.json), validated by [`tool_loader.py`](tool_loader.py), implemented in [`tools.py`](tools.py):
 
 | Tool | Purpose |
 | --- | --- |
 | `record_user_details` | Records a visitor's email (and optional name/notes) when they want to be contacted |
 | `record_unknown_question` | Records a question the twin couldn't answer |
 
-Both tools push a notification to my phone via [Pushover](https://pushover.net/) so I see follow-up requests and knowledge gaps in real time.
-
-[`app.py`](app.py) wires it all together: it sends the conversation to the model, runs the tool-calling loop when the model requests a tool, and serves the result through a styled `gr.ChatInterface` (custom CSS/JS/theme colors live in [`styles.py`](styles.py)).
+Both push a notification via [Pushover](https://pushover.net/), so follow-up requests and knowledge gaps arrive in real time. Notifications are best-effort — without the Pushover keys the app still runs.
 
 ## Project layout
 
 ```
-app.py           # Entry point: OpenAI/OpenRouter client, chat loop, Gradio UI
-context.py       # Builds the system prompt from summary.txt + linkedin.pdf
-tools.py         # Tool implementations (record_user_details, record_unknown_question)
+profile.yaml     # All content + palette. Edit this to make the site yours.
+profile.py       # Pydantic schema + validating loader for profile.yaml
+sections.py      # Pure Profile -> HTML renderers, one per page section
+theme.py         # Builds the stylesheet from the configured palette; page JS
+context.py       # Builds the twin's system prompt from twin.sources
+app.py           # Gradio assembly + chat wiring (only module importing gradio)
+tools.py         # Tool implementations
 tool_loader.py   # Loads + validates tools.json into OpenAI-style tool schemas
 tools.json       # Tool (function-calling) schema definitions
-styles.py        # CSS/JS/theme + example prompts for the Gradio UI
-summary.txt      # Short bio used as part of the twin's context
-linkedin.pdf     # LinkedIn export, parsed for additional context
+summary.txt      # Short bio, referenced from twin.sources
+linkedin.pdf     # LinkedIn export, referenced from twin.sources
+assets/          # Profile photo and screenshot
+tests/           # pytest suite
 ```
 
 ## Setup
@@ -48,14 +69,12 @@ Requires Python 3.13+.
 1. Install dependencies:
 
    ```bash
-   # using uv (reads pyproject.toml / uv.lock)
-   uv sync
-
-   # or with pip
+   uv sync          # reads pyproject.toml / uv.lock
+   # or
    pip install -r requirements.txt
    ```
 
-2. Create a `.env` file in the project root with:
+2. Create a `.env` file in the project root:
 
    ```
    OPENROUTER_API_KEY=your_openrouter_api_key
@@ -64,10 +83,9 @@ Requires Python 3.13+.
    PUSHOVER_TOKEN=your_pushover_app_token
    ```
 
-   - `OPENROUTER_API_KEY` / `OPENROUTER_BASE_URL` — used to call the LLM via [OpenRouter](https://openrouter.ai/). The app defaults to the `openrouter/free` model (see `MODEL_NAME` in [`app.py`](app.py)).
-   - `PUSHOVER_USER` / `PUSHOVER_TOKEN` — used to push notifications when a visitor leaves contact details or asks something the twin can't answer. Get these from [Pushover](https://pushover.net/). Notifications are best-effort — if these are unset, the app still runs, just without the push alerts.
+3. Edit [`profile.yaml`](profile.yaml) — identity, palette, about, journey, portfolio, contact, and the twin's model, greeting and example prompts all live there. Point `identity.photo` at your own image in `assets/`, and list your own context files under `twin.sources`.
 
-3. Replace [`linkedin.pdf`](linkedin.pdf) and [`summary.txt`](summary.txt) with your own profile export and bio to make the twin represent you instead.
+   Only `identity` and `twin` are required. Every other section is optional and defaults to empty.
 
 ## Running
 
@@ -75,14 +93,38 @@ Requires Python 3.13+.
 python app.py
 ```
 
-This launches a local Gradio server (URL printed in the terminal) with the chat UI shown above. Open it in a browser and start chatting with the twin, or click one of the example prompts to get started.
+Gradio prints a local URL. A bad `profile.yaml` fails here, immediately, naming the offending field — not later, inside a render or an API call.
 
 ## Customizing
 
-- **Personality / rules** — edit the prompt template in [`context.py`](context.py).
-- **Tools** — add a new schema to [`tools.json`](tools.json), then implement and register the corresponding function in [`tools.py`](tools.py) (`tool_map`).
-- **Look and feel** — colors, fonts, and example prompts live in [`styles.py`](styles.py).
-- **Model** — change `MODEL_NAME` in [`app.py`](app.py) to any model your OpenRouter account can access.
+| What | Where |
+| --- | --- |
+| Text, sections, links, career entries | `profile.yaml` |
+| Colours | `profile.yaml` → `theme:` (8 tokens) |
+| Chat examples, greeting, model | `profile.yaml` → `twin:` |
+| Prompt context files | `profile.yaml` → `twin.sources` |
+| Page markup | `sections.py` |
+| Layout and styling | `theme.py` |
+| Tools the twin can call | `tools.json` + `tools.py` |
+
+## Testing
+
+```bash
+python -m pytest tests/ -v
+```
+
+Covers config validation and error messages, HTML escaping and link-scheme allowlisting, palette-to-CSS mapping, and prompt assembly from configured sources.
+
+Tests cannot catch a broken layout, so changes to `sections.py` or `theme.py` are worth confirming in a browser.
+
+## Notes on Gradio 6
+
+This runs on Gradio 6, which differs from most examples online:
+
+- `css`, `js` and `theme` are `launch()` arguments, not `gr.Blocks()` arguments.
+- `launch(js=...)` does not execute; page JS is attached with `demo.load(None, None, None, js=JS)`.
+- `gr.Chatbot` has no `type=` parameter — history is always `list[dict]`.
+- Static files are served from `/gradio_api/file=<path>`, and the directory must be registered with `gr.set_static_paths`.
 
 ## License
 

@@ -9,7 +9,7 @@ identity:
     Software engineer with 10+ years building APIs, distributed systems and
     high-throughput services in Java and the JVM ecosystem. Strong focus on
     design elegance, software reuse, and open source.
-  photo: assets/photo.jpg
+  photo: /gradio_api/file=assets/photo.jpg
 
 theme:
   bg: "#0A0A0F"
