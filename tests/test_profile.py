@@ -91,3 +91,4 @@ def test_malformed_yaml_reports_position(tmp_path):
     with pytest.raises(ValueError) as exc:
         load_profile(path)
     assert "profile.yaml" in str(exc.value)
+    assert "line" in str(exc.value)

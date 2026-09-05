@@ -1,9 +1,9 @@
 """Load and validate the site profile — the single source of content and colour.
 
 Everything the page shows and every colour it uses comes from `profile.yaml`.
-Swapping that file swaps the whole site. Validation happens once, at import,
-so a typo surfaces on startup with the field named rather than as a confusing
-failure deep inside a render or an API call.
+Swapping that file swaps the whole site. Validation happens on the first call to
+load_profile(), with results cached thereafter, so a typo surfaces early with the
+field named rather than as a confusing failure deep inside a render or an API call.
 """
 
 from __future__ import annotations
