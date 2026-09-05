@@ -1,0 +1,154 @@
+# Everything this site shows comes from this file. Swap it to swap the site.
+# Lines marked "# review:" were inferred from linkedin.pdf — correct them.
+
+identity:
+  name: Mithat Konuk
+  role: Backend Engineer
+  location: Munich, Germany
+  tagline: >-
+    Software engineer with 10+ years building APIs, distributed systems and
+    high-throughput services in Java and the JVM ecosystem. Strong focus on
+    design elegance, software reuse, and open source.
+  photo: assets/photo.jpg
+
+theme:
+  bg: "#0A0A0F"
+  surface: "#14141C"
+  surface_alt: "#1B1B25"
+  border: "#26262F"
+  text: "#ECECF1"
+  muted: "#7C7C8A"
+  accent: "#F0B429"
+  accent_alt: "#A855F7"
+
+about:
+  - >-
+    I have spent over ten years across the whole software lifecycle — creating
+    APIs and features, architecting and implementing object-oriented and
+    distributed systems, working directly with customers, and designing and
+    analysing algorithms.
+  - >-
+    My work has centred on high-throughput web applications and system design:
+    Spring and Quarkus services, microservices and containerisation, and the
+    messaging and storage layers underneath them. I care about API design,
+    systems architecture, and concurrent systems.
+  - >-
+    I am originally from Türkiye and moved to Germany in 2021. I am a friendly
+    communicator, a hard worker, and happy to take responsibility for the
+    things I build.
+
+journey:
+  - period: "2025 — present"
+    role: Software Engineer
+    org: Entirely
+    location: Munich, Germany
+    detail: >-
+      Part of the R&D team at Entirely — an open marketing-technology ecosystem
+      founded by Marmind, censhare, Elaine and Facelift — held alongside my
+      senior developer role at censhare.
+    tags: [R&D, Martech]
+
+  - period: "2021 — 2025"
+    role: Back End Developer
+    org: censhare
+    location: Munich, Germany
+    detail: >-
+      Core team, working across DAM, CMS and content management.
+    tags: [Java, DAM, CMS]
+
+  - period: "2021"
+    role: Software Craftsman
+    org: Sqills
+    location: Amsterdam, Netherlands
+    detail: >-
+      Improved the architecture of in-house IT solutions for the S3 Passenger
+      suite — seat reservation, ticketing, distribution and revenue management
+      for rail and bus operators. Converted a monolith into maintainable
+      containerised microservices and introduced application metrics and
+      monitoring with alerting on defined violations.
+    tags: [Java, Microservices, Docker]
+
+  - period: "2018 — 2021"
+    role: Software Craftsman
+    org: sahibinden.com
+    location: Istanbul, Türkiye
+    detail: >-
+      Built a store warning system and an auctions acceptance system for
+      Türkiye's largest online classifieds site — 10 Gbps+ peak traffic,
+      1.5 billion monthly page views, 43 million monthly unique visitors.
+    tags: [Java 11, Kotlin, Spring Boot, Cassandra, Spark, Redis]
+
+  - period: "2014 — 2018"
+    role: Senior Software Engineer
+    org: NETAŞ
+    location: Istanbul, Türkiye
+    detail: >-
+      V-Gate VoIP security platform (fraud and network attack protection), a
+      license management system, and a mediation data-flow service collecting
+      and encrypting customer telecommunication data over Kafka and ZooKeeper
+      channels — full responsibility for its design, implementation and testing.
+      Earlier, a OneM2M telecommunication gateway in C/C++/Java, converting CoAP
+      to bidirectional HTTP.
+    tags: [Java EE, Spring Boot, Kafka, ZooKeeper, PostgreSQL]
+
+  - period: "2013 — 2014"
+    role: Software Engineer
+    org: PHI Tech Bioinformatics / Globit
+    location: Istanbul, Türkiye
+    detail: >-
+      Implemented the BLAST algorithm for protein and human DNA sequence
+      comparison, published in Oxford Bioinformatics. Also built a SaaS
+      timesheet application and a license management system at Globit.
+    tags: [Java, Algorithms, PostgreSQL]
+
+# review: these are placeholders — replace with the projects you want to show.
+portfolio:
+  - title: Digital Twin
+    blurb: >-
+      This site's AI twin — a config-driven Gradio app that answers questions
+      about my background, with tool calls for contact capture and unanswered
+      questions.
+    tags: [Python, Gradio, LLM, OpenRouter]
+    url: https://github.com/mko/twin
+
+  - title: Phisto
+    blurb: >-
+      Pathogen–host interaction search tool. BLAST-based sequence comparison,
+      published in Oxford Bioinformatics.
+    tags: [Java, Bioinformatics, Algorithms]
+    url: https://academic.oup.com/bioinformatics/article/29/10/1357/257455
+
+  - title: Mediation Data Flow
+    blurb: >-
+      Telecommunication data collection platform — an API-gateway mediation
+      server plus on-premise agents streaming encrypted data over dedicated
+      Kafka channels with pluggable adapters and converters.
+    tags: [Java Core, Kafka, ZooKeeper, PostgreSQL]
+
+contact:
+  intro: >-
+    Happy to talk about backend work, distributed systems, or anything you read
+    above. The twin can also take your details and pass them along.
+  links:
+    - label: Email
+      href: mailto:mithatkonuk@gmail.com
+    - label: LinkedIn
+      href: https://www.linkedin.com/in/mithat-konuk
+
+twin:
+  model: openrouter/free
+  heading: Digital Twin
+  subheading: Ask about my career
+  greeting: >-
+    I can answer questions about Mithat's background, roles, and technical
+    experience, grounded in what is on this site.
+  examples:
+    - Tell me about your background and experience.
+    - What kinds of systems have you built at scale?
+    - What are your strongest technical skills?
+    - How can I get in touch with you?
+  sources:
+    - type: text
+      path: summary.txt
+    - type: pdf
+      path: linkedin.pdf

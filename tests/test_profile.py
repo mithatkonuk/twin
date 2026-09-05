@@ -92,3 +92,12 @@ def test_malformed_yaml_reports_position(tmp_path):
         load_profile(path)
     assert "profile.yaml" in str(exc.value)
     assert "line" in str(exc.value)
+
+
+def test_shipped_profile_loads():
+    from profile import PROFILE_PATH
+
+    profile = load_profile(PROFILE_PATH)
+    assert profile.identity.name
+    assert profile.journey, "expected seeded journey entries"
+    assert profile.twin.sources, "expected seeded prompt sources"
