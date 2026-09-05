@@ -38,6 +38,7 @@ about:
     things I build.
 
 journey:
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
   - period: "2025 — present"
     role: Software Engineer
     org: Entirely
@@ -48,14 +49,16 @@ journey:
       senior developer role at censhare.
     tags: [R&D, Martech]
 
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
   - period: "2021 — 2025"
     role: Back End Developer
     org: censhare
     location: Munich, Germany
     detail: >-
       Core team, working across DAM, CMS and content management.
-    tags: [Java, DAM, CMS]
+    tags: [DAM, CMS]
 
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
   - period: "2021"
     role: Software Craftsman
     org: Sqills
@@ -68,6 +71,7 @@ journey:
       monitoring with alerting on defined violations.
     tags: [Java, Microservices, Docker]
 
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
   - period: "2018 — 2021"
     role: Software Craftsman
     org: sahibinden.com
@@ -78,28 +82,54 @@ journey:
       1.5 billion monthly page views, 43 million monthly unique visitors.
     tags: [Java 11, Kotlin, Spring Boot, Cassandra, Spark, Redis]
 
-  - period: "2014 — 2018"
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
+  - period: "2016 — 2018"
     role: Senior Software Engineer
     org: NETAŞ
     location: Istanbul, Türkiye
     detail: >-
-      V-Gate VoIP security platform (fraud and network attack protection), a
-      license management system, and a mediation data-flow service collecting
-      and encrypting customer telecommunication data over Kafka and ZooKeeper
-      channels — full responsibility for its design, implementation and testing.
-      Earlier, a OneM2M telecommunication gateway in C/C++/Java, converting CoAP
-      to bidirectional HTTP.
+      Mediation data-flow service collecting and encrypting customer
+      telecommunication data over Kafka and ZooKeeper channels, a license
+      management system (Java EE, Spring Boot, PostgreSQL, AES encryption),
+      and the V-Gate VoIP security platform protecting against fraud and
+      network attacks — full responsibility for the mediation project's
+      design, implementation and testing.
     tags: [Java EE, Spring Boot, Kafka, ZooKeeper, PostgreSQL]
 
-  - period: "2013 — 2014"
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
+  - period: "2014 — 2016"
     role: Software Engineer
-    org: PHI Tech Bioinformatics / Globit
+    org: NETAŞ
     location: Istanbul, Türkiye
     detail: >-
-      Implemented the BLAST algorithm for protein and human DNA sequence
-      comparison, published in Oxford Bioinformatics. Also built a SaaS
-      timesheet application and a license management system at Globit.
-    tags: [Java, Algorithms, PostgreSQL]
+      OneM2M telecommunication gateway in C/C++/Java, converting the CoAP
+      protocol to bidirectional HTTP over TCP/IP and TCP/UDP sockets; the
+      GVP-C20-OAM back-end OAM service (Java JAX-RS, Hibernate/JPA); and
+      tooling for the C15 telecommunication SL1 programming-language IDE
+      (code and keyword suggestion).
+    tags: [C, C++, Java, JAX-RS, Hibernate]
+
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
+  - period: "2014"
+    role: Software Engineer
+    org: Globit Global Bilgi Teknolojileri A.S.
+    location: Istanbul, Türkiye
+    detail: >-
+      Timesheet SaaS application tracking customer performance, salaries and
+      worked hours (Java RS, Vaadin UI, PostgreSQL), and a license management
+      system with encryption for Globit's OAS product line.
+    tags: [Java, Vaadin, PostgreSQL]
+
+  # review: detail is paraphrased from linkedin.pdf — verify wording.
+  - period: "2013"
+    role: Software Engineer
+    org: PHI Tech Bioinformatics
+    location: Istanbul, Türkiye
+    detail: >-
+      Implemented the BLAST algorithm for protein-sequence and
+      human-DNA-sequence comparison; co-authored the resulting paper,
+      published in Oxford Bioinformatics.
+    tags: [Bioinformatics, Algorithms]
 
 # review: these are placeholders — replace with the projects you want to show.
 portfolio:
@@ -109,7 +139,6 @@ portfolio:
       about my background, with tool calls for contact capture and unanswered
       questions.
     tags: [Python, Gradio, LLM, OpenRouter]
-    url: https://github.com/mko/twin
 
   - title: Phisto
     blurb: >-
