@@ -342,13 +342,20 @@ body {
 }
 
 /* ---------- Pinned twin panel ---------- */
+/* Size lives in two custom properties so the drag handles (and the persisted
+   localStorage value) can set it from JS without fighting the !important rules
+   Gradio's own styles force us into. The clamps keep any restored size inside
+   the current viewport, which is what makes the panel survive a window
+   resize or a move to a smaller screen. */
 #twin-panel {
   position: fixed !important;
   right: 22px;
   bottom: 22px;
   z-index: 60;
-  width: 380px;
-  max-height: min(600px, 82vh) !important;
+  width: clamp(300px, var(--tw-panel-w, 400px), calc(100vw - 44px)) !important;
+  height: clamp(260px, var(--tw-panel-h, 620px), calc(100vh - 44px)) !important;
+  max-height: calc(100vh - 44px) !important;
+  max-width: calc(100vw - 44px) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0 !important;
@@ -358,11 +365,58 @@ body {
   overflow: hidden;
   box-shadow: 0 30px 70px -24px rgba(0, 0, 0, 0.72);
 }
+/* While dragging, suppress transitions and text selection so the drag reads
+   as a direct manipulation rather than a lagging animation. */
+#twin-panel.tw-resizing { transition: none !important; }
+body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !important; }
+
 /* The body carries `display: flex !important` below, so the collapse rule has
    to be !important too or collapsing would leave it visible (and, with the
    height cap lifted, actually taller than the open panel). */
 #twin-panel.tw-collapsed .tw-panel__body { display: none !important; }
-#twin-panel.tw-collapsed { max-height: none !important; }
+#twin-panel.tw-collapsed { height: auto !important; max-height: none !important; }
+#twin-panel.tw-collapsed .tw-panel__grip { display: none !important; }
+
+/* Maximised: one click to a near-full-height reading pane, one click back. */
+#twin-panel.tw-maximised {
+  width: min(760px, calc(100vw - 44px)) !important;
+  height: calc(100vh - 44px) !important;
+}
+
+/* ---------- Resize handles ---------- */
+/* The panel is anchored bottom-right, so it grows up and to the left: handles
+   sit on the top and left edges plus the top-left corner. */
+/* Gradio gives every block `position: relative`, which would make the header's
+   own wrapper the containing block for the grips and pin them to the header
+   strip instead of the panel edges. Neutralise it on the header wrapper only
+   (the first child of the panel) so the grips resolve against #twin-panel. */
+#twin-panel > *:first-child,
+#twin-panel > *:first-child > * {
+  position: static !important;
+  overflow: visible !important;
+}
+
+.tw-panel__grip {
+  position: absolute;
+  z-index: 3;
+  touch-action: none;
+}
+.tw-panel__grip--top { top: 0; left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+.tw-panel__grip--left { left: 0; top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+.tw-panel__grip--corner {
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  border-top: 2px solid transparent;
+  border-left: 2px solid transparent;
+  border-top-left-radius: 16px;
+  transition: border-color 0.15s ease;
+}
+#twin-panel:hover .tw-panel__grip--corner {
+  border-color: color-mix(in srgb, var(--tw-accent) 55%, transparent);
+}
 
 .tw-panel__head {
   flex: 0 0 auto;
@@ -370,7 +424,7 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 14px 16px 14px 20px;
   border-bottom: 1px solid var(--tw-border);
   cursor: pointer;
 }
@@ -388,13 +442,25 @@ body {
   color: var(--tw-muted) !important;
   margin: 2px 0 0;
 }
-.tw-panel__toggle {
+.tw-panel__actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+.tw-panel__toggle, .tw-panel__expand {
   color: var(--tw-muted) !important;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: 0;
+  border-radius: 7px;
   cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.tw-panel__toggle:hover, .tw-panel__expand:hover {
+  color: var(--tw-text) !important;
+  background: var(--tw-surface-alt) !important;
 }
 /* Gradio wraps gr.HTML content in its own prose styles and colours the text
    with an !important rule of its own; these ids raise specificity enough to
@@ -412,6 +478,12 @@ body {
   overflow: hidden;
 }
 
+/* Gradio renders the Chatbot inside a wrapper block and stamps its `height`
+   (400px by default) on that wrapper as an inline style — which no `.chatbot`
+   selector reaches, so the message list stayed 400px tall and left dead space
+   above the composer in a taller panel. Target the body's first child, which
+   is that wrapper, and let it take whatever room the panel has. */
+#twin-panel .tw-panel__body > *:first-child,
 #twin-panel .chatbot, #twin-panel .chatbot.block {
   background: transparent !important;
   border: 0 !important;
@@ -465,9 +537,71 @@ body {
 #twin-panel .message p:last-child, #twin-panel .prose p:last-child {
   margin-bottom: 0 !important;
 }
-#twin-panel .message a { color: var(--tw-accent) !important; }
+/* Only `p` used to be recoloured, so every other element the model's markdown
+   produces — headings, `strong`, list items, blockquotes, table cells — kept
+   Gradio's own prose colour, which is tuned for a light theme and renders
+   near-black on this near-black surface. That is why an answer showed a few
+   readable paragraphs and the rest as barely-visible grey. Recolour the whole
+   subtree, then restore the two things that are deliberately not body text. */
+#twin-panel .message,
+#twin-panel .message *,
+#twin-panel .message .prose,
+#twin-panel .message .prose * {
+  color: var(--tw-text) !important;
+}
+#twin-panel .message h1, #twin-panel .message h2, #twin-panel .message h3,
+#twin-panel .message h4, #twin-panel .message h5, #twin-panel .message h6 {
+  font-size: 14.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.4 !important;
+  margin: 12px 0 6px !important;
+}
+#twin-panel .message ul, #twin-panel .message ol {
+  margin: 0 0 8px !important;
+  padding-left: 18px !important;
+}
+#twin-panel .message li { margin: 0 0 4px !important; }
+#twin-panel .message code, #twin-panel .message pre {
+  background: var(--tw-bg) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+}
+#twin-panel .message blockquote {
+  border-left: 2px solid var(--tw-border) !important;
+  padding-left: 10px !important;
+  color: var(--tw-muted) !important;
+}
+
+/* Gradio also fades each rendered chunk in. In a panel this short a chunk that
+   finishes while the list is scrolling can settle at a partial opacity and stay
+   there, which reads as the same washed-out text. Nothing here depends on that
+   animation. */
+#twin-panel .message,
+#twin-panel .message *,
+#twin-panel .message-row,
+#twin-panel .message-row * {
+  animation: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Long words, URLs, tables and code blocks must not push the bubble wider than
+   the panel — at 300px that is the difference between readable and clipped. */
+#twin-panel .message, #twin-panel .message * {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100% !important;
+}
+#twin-panel .message pre, #twin-panel .message table {
+  display: block;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
 
 .tw-examples { flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; padding: 0 12px 8px; }
+/* `visible=False` from the chat callback must win over the `display: flex`
+   above, whichever hide class this Gradio version applies. */
+.tw-examples.hide, .tw-examples.hidden { display: none !important; }
 .tw-examples button {
   text-align: left !important;
   font-size: 12.5px !important;
@@ -530,27 +664,51 @@ body {
 
 /* Wide screens: give the docked panel its own lane so it stops covering the
    right-hand edge of the content column (it was overlapping a portfolio card).
-   Below this width the panel overlays, which is normal for a chat widget. */
+   The lane tracks the panel's own width so a modest resize still keeps the
+   content clear — but it stops at 454px. Past that the panel overlays instead,
+   which is the normal behaviour for a chat widget and avoids crushing the
+   article column down to a couple of words per line. */
 @media (min-width: 1200px) {
   .tw-nav__inner, .tw-hero, .tw-section, .tw-footer {
     margin-left: auto;
-    margin-right: 434px;
+    margin-right: min(calc(var(--tw-panel-w, 400px) + 54px), 454px);
+    transition: margin-right 0.12s ease;
   }
+}
+
+/* Between the wide lane and the mobile sheet the panel overlays the content
+   (normal for a chat widget) but must not outgrow the viewport. */
+@media (max-width: 1199px) {
+  #twin-panel { width: clamp(300px, var(--tw-panel-w, 400px), calc(100vw - 44px)) !important; }
 }
 
 @media (max-width: 780px) {
   .tw-hero { flex-direction: column-reverse; align-items: flex-start; gap: 28px; padding-top: 56px; }
   .tw-hero__photo { width: 116px; height: 116px; }
   .tw-nav__links { gap: 14px; }
-  #twin-panel {
+  /* Mobile: a bottom sheet. Dragging a corner on a touch device fights the
+     page scroll, so the handles go away and the height follows the viewport
+     (dvh so the iOS URL bar does not clip the composer). */
+  #twin-panel, #twin-panel.tw-maximised {
     right: 0;
     left: 0;
     bottom: 0;
-    width: auto;
+    width: auto !important;
+    max-width: none !important;
     border-radius: 16px 16px 0 0;
-    max-height: min(600px, 78vh) !important;
+    height: clamp(260px, var(--tw-panel-h, 70dvh), 85dvh) !important;
+    max-height: 85dvh !important;
   }
+  #twin-panel .tw-panel__grip { display: none !important; }
+  .tw-panel__head { padding-left: 16px; }
   .tw-footer { padding-bottom: 180px; }
+}
+
+/* Short windows (a laptop with devtools open, a split screen): the composer is
+   the one thing that must never be pushed out of view. */
+@media (max-height: 520px) {
+  #twin-panel, #twin-panel.tw-maximised { height: calc(100vh - 16px) !important; bottom: 8px; }
+  .tw-examples { display: none !important; }
 }
 """
 
@@ -575,6 +733,80 @@ JS = """
   if (document.body.dataset.twBound) return;
   document.body.dataset.twBound = '1';
 
+  const MIN_W = 300, MIN_H = 260, STORE = 'tw-panel-size';
+  const root = document.documentElement;
+
+  // The size lives on :root, not on the panel, because the wide-screen content
+  // lane reads the same custom property to keep itself clear of the panel.
+  // Gradio re-renders the panel node; :root survives that.
+  const maxW = () => Math.max(MIN_W, window.innerWidth - 44);
+  const maxH = () => Math.max(MIN_H, window.innerHeight - 44);
+  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+
+  const apply = (w, h) => {
+    root.style.setProperty('--tw-panel-w', clamp(w, MIN_W, maxW()) + 'px');
+    root.style.setProperty('--tw-panel-h', clamp(h, MIN_H, maxH()) + 'px');
+  };
+
+  let size = { w: 400, h: 620 };
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (saved && saved.w > 0 && saved.h > 0) size = saved;
+  } catch (err) { /* private mode / blocked storage - keep the default */ }
+  apply(size.w, size.h);
+
+  const save = () => {
+    try { localStorage.setItem(STORE, JSON.stringify(size)); } catch (err) {}
+  };
+
+  // Re-clamp on window resize so a size saved on a big monitor does not leave
+  // the panel hanging off a small one.
+  window.addEventListener('resize', () => apply(size.w, size.h));
+
+  // ---- Drag to resize -------------------------------------------------
+  // The panel is anchored bottom-right, so dragging the top/left edges toward
+  // the top-left grows it: the delta is subtracted, not added.
+  let drag = null;
+
+  document.addEventListener('pointerdown', (e) => {
+    const grip = e.target.closest('.tw-panel__grip');
+    const panel = document.getElementById('twin-panel');
+    if (!grip || !panel) return;
+    e.preventDefault();
+
+    const rect = panel.getBoundingClientRect();
+    drag = {
+      axis: grip.dataset.twAxis || 'both',
+      x: e.clientX, y: e.clientY, w: rect.width, h: rect.height,
+    };
+    panel.classList.remove('tw-maximised');
+    panel.classList.add('tw-resizing');
+    document.body.classList.add('tw-resizing-active');
+    // Capture keeps the drag alive when the pointer leaves the 8px handle.
+    // Not every pointer source supports it; the document-level move/up
+    // listeners cover the drag either way.
+    try { grip.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+
+  document.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    if (drag.axis !== 'y') size.w = clamp(drag.w + (drag.x - e.clientX), MIN_W, maxW());
+    if (drag.axis !== 'x') size.h = clamp(drag.h + (drag.y - e.clientY), MIN_H, maxH());
+    apply(size.w, size.h);
+  });
+
+  const endDrag = () => {
+    if (!drag) return;
+    drag = null;
+    document.body.classList.remove('tw-resizing-active');
+    const panel = document.getElementById('twin-panel');
+    if (panel) panel.classList.remove('tw-resizing');
+    save();
+  };
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', endDrag);
+
+  // ---- Clicks ---------------------------------------------------------
   document.addEventListener('click', (e) => {
     const panel = document.getElementById('twin-panel');
     if (!panel) return;
@@ -587,9 +819,25 @@ JS = """
       return;
     }
 
+    // Checked before the header rule below, which would otherwise collapse the
+    // panel as the click bubbles out of the button.
+    if (e.target.closest('.tw-panel__expand')) {
+      e.preventDefault();
+      e.stopPropagation();
+      panel.classList.remove('tw-collapsed');
+      panel.classList.toggle('tw-maximised');
+      return;
+    }
+
     if (e.target.closest('.tw-panel__head')) {
       panel.classList.toggle('tw-collapsed');
     }
   });
+
+  // A resize handle lives on the header edges; a drag that ends on the header
+  // must not also register as the collapse click.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.tw-panel__grip')) e.stopPropagation();
+  }, true);
 }
 """

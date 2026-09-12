@@ -56,10 +56,17 @@ def chat(message, history):
 
 
 def respond(message, history):
-    """Chat callback: append the turn, clear the box. Errors surface in-panel."""
+    """Chat callback: append the turn, clear the box. Errors surface in-panel.
+
+    Third output hides the starter questions: they are a prompt for a visitor
+    who has not asked anything yet, so once the conversation is under way they
+    are just noise taking up the panel's scarce vertical space.
+    """
     message = (message or "").strip()
     if not message:
-        return history, ""
+        # `gr.update()` with no arguments leaves the examples as they are — an
+        # empty submit must not un-hide them mid-conversation.
+        return history, "", gr.update()
 
     try:
         reply = chat(message, history)
@@ -74,6 +81,7 @@ def respond(message, history):
             {"role": "assistant", "content": reply},
         ],
         "",
+        gr.update(visible=False),
     )
 
 
@@ -84,9 +92,23 @@ def panel_header() -> str:
         else ""
     )
     return (
+        # The grips are absolutely positioned against #twin-panel (the nearest
+        # positioned ancestor), so they sit on the panel's top/left edges even
+        # though they are emitted here inside the header block.
+        '<div class="tw-panel__grip tw-panel__grip--top" data-tw-axis="y"'
+        ' title="Drag to resize"></div>'
+        '<div class="tw-panel__grip tw-panel__grip--left" data-tw-axis="x"'
+        ' title="Drag to resize"></div>'
+        '<div class="tw-panel__grip tw-panel__grip--corner" data-tw-axis="both"'
+        ' title="Drag to resize"></div>'
         '<div class="tw-panel__head">'
         f'<div><p class="tw-panel__title">{profile.twin.heading}</p>{sub}</div>'
-        '<button class="tw-panel__toggle" type="button">—</button>'
+        '<div class="tw-panel__actions">'
+        '<button class="tw-panel__expand" type="button"'
+        ' title="Expand / restore" aria-label="Expand or restore panel">⤢</button>'
+        '<button class="tw-panel__toggle" type="button"'
+        ' title="Minimise" aria-label="Minimise panel">—</button>'
+        "</div>"
         "</div>"
     )
 
@@ -112,7 +134,7 @@ with gr.Blocks(title=f"{profile.identity.name} · {profile.identity.role}") as d
                 show_label=False,
                 container=False,
             )
-            with gr.Column(elem_classes="tw-examples"):
+            with gr.Column(elem_classes="tw-examples") as examples_box:
                 example_buttons = [
                     gr.Button(text, size="sm") for text in profile.twin.examples
                 ]
@@ -126,13 +148,12 @@ with gr.Blocks(title=f"{profile.identity.name} · {profile.identity.role}") as d
                 )
                 send = gr.Button("Send", variant="primary", scale=1, elem_classes="tw-send")
 
-    msg.submit(respond, [msg, chatbot], [chatbot, msg])
-    send.click(respond, [msg, chatbot], [chatbot, msg])
+    outputs = [chatbot, msg, examples_box]
+    msg.submit(respond, [msg, chatbot], outputs)
+    send.click(respond, [msg, chatbot], outputs)
 
     for button, text in zip(example_buttons, profile.twin.examples):
-        button.click(lambda t=text: t, None, msg).then(
-            respond, [msg, chatbot], [chatbot, msg]
-        )
+        button.click(lambda t=text: t, None, msg).then(respond, [msg, chatbot], outputs)
 
     # Gradio 6 does not run `launch(js=...)` — verified in the browser: the hook
     # never fired. The load event does, and it fires after the components are
