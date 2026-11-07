@@ -140,7 +140,7 @@ with gr.Blocks(title=f"{profile.identity.name} · {profile.identity.role}") as d
                 ]
             with gr.Row(elem_classes="tw-composer"):
                 msg = gr.Textbox(
-                    placeholder="Ask about experience, skills, background…",
+                    placeholder="Ask about my experience, skills…",
                     show_label=False,
                     container=False,
                     lines=1,

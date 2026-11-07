@@ -10,7 +10,7 @@ from __future__ import annotations
 from profile import Theme
 
 CSS_TEMPLATE = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ---------- Reset the Gradio chrome we do not want ---------- */
 footer, .built-with, .show-api, .api-docs { display: none !important; }
@@ -20,9 +20,14 @@ html, body, gradio-app {
   color: var(--tw-text);
 }
 
+/* Frosted-glass backdrop: a soft white bloom at the top fading into a cool
+   grey-blue, so the translucent cards have something to blur against. */
 body {
-  background-image: radial-gradient(var(--tw-grid) 1px, transparent 1px) !important;
-  background-size: 26px 26px !important;
+  background-image:
+    radial-gradient(1100px 620px at 78% -8%, color-mix(in srgb, var(--tw-highlight) 90%, transparent), transparent 70%),
+    radial-gradient(900px 700px at -10% 110%, color-mix(in srgb, var(--tw-accent-alt) 28%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--tw-bg) 0%, color-mix(in srgb, var(--tw-accent-alt) 18%, var(--tw-bg)) 100%) !important;
+  background-attachment: fixed !important;
 }
 
 .gradio-container {
@@ -56,9 +61,9 @@ body {
   top: 0;
   z-index: 40;
   max-width: 100%;
-  backdrop-filter: blur(14px);
-  background: color-mix(in srgb, var(--tw-bg) 78%, transparent);
-  border-bottom: 1px solid var(--tw-border);
+  backdrop-filter: blur(18px) saturate(140%);
+  background: color-mix(in srgb, var(--tw-highlight) 55%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--tw-highlight) 70%, var(--tw-border));
 }
 .tw-nav__inner {
   max-width: 940px;
@@ -82,8 +87,15 @@ body {
   transition: color 0.15s ease;
 }
 .tw-nav__link:hover { color: var(--tw-text); }
-.tw-nav__link--cta { color: var(--tw-accent); }
-.tw-nav__link--cta:hover { color: var(--tw-accent-alt); }
+.tw-nav__link--cta {
+  color: var(--tw-highlight);
+  background: var(--tw-accent);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--tw-accent) 70%, transparent);
+}
+.tw-nav__link--cta:hover { color: var(--tw-highlight); background: color-mix(in srgb, var(--tw-accent) 85%, var(--tw-text)); }
 
 /* ---------- Hero ---------- */
 .tw-hero {
@@ -104,10 +116,10 @@ body {
   pointer-events: none;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--tw-accent) 22%, transparent) 0%,
+    color-mix(in srgb, var(--tw-highlight) 85%, transparent) 0%,
     transparent 68%
   );
-  filter: blur(30px);
+  filter: blur(20px);
 }
 .tw-hero__text { position: relative; max-width: 560px; }
 .tw-hero__eyebrow {
@@ -116,20 +128,22 @@ body {
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--tw-accent);
-  border: 1px solid var(--tw-border);
+  color: var(--tw-text);
+  background: var(--tw-highlight);
+  border: 0;
   border-radius: 999px;
-  padding: 5px 12px;
+  padding: 6px 13px;
   margin-bottom: 22px;
+  box-shadow: 0 6px 18px -10px color-mix(in srgb, var(--tw-accent) 45%, transparent);
 }
 .tw-hero__name {
   display: block !important;
-  font-size: clamp(38px, 6vw, 62px);
-  font-weight: 700;
+  font-size: clamp(40px, 6.4vw, 68px);
+  font-weight: 300;
   line-height: 1.04;
-  letter-spacing: -0.035em;
-  margin: 0 0 10px;
-  background-image: linear-gradient(100deg, var(--tw-accent) 8%, var(--tw-accent-alt) 82%) !important;
+  letter-spacing: -0.04em;
+  margin: 0 0 12px;
+  background-image: linear-gradient(100deg, var(--tw-text) 35%, var(--tw-accent-alt) 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -155,10 +169,10 @@ body {
   height: 172px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid var(--tw-border);
+  border: 1px solid var(--tw-highlight);
   box-shadow:
-    0 0 0 6px color-mix(in srgb, var(--tw-surface) 60%, transparent),
-    0 26px 60px -22px color-mix(in srgb, var(--tw-accent) 45%, transparent);
+    0 0 0 7px color-mix(in srgb, var(--tw-highlight) 55%, transparent),
+    0 26px 60px -24px color-mix(in srgb, var(--tw-accent) 55%, transparent);
 }
 .tw-hero__initials {
   display: flex;
@@ -184,17 +198,28 @@ body {
 }
 .tw-section__title {
   display: block !important;
-  font-size: 27px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
   margin: 0 0 24px;
   color: var(--tw-text);
 }
+/* Frosted glass: a translucent white-to-surface wash, a bright hairline edge,
+   an inset top highlight and a soft accent-tinted drop shadow. */
 .tw-card {
-  background: var(--tw-surface);
-  border: 1px solid var(--tw-border);
-  border-radius: 14px;
-  padding: 26px 28px;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--tw-highlight) 82%, transparent) 0%,
+    color-mix(in srgb, var(--tw-surface) 58%, transparent) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--tw-highlight) 90%, transparent);
+  border-radius: 22px;
+  padding: 28px 30px;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 var(--tw-highlight),
+    0 22px 48px -30px color-mix(in srgb, var(--tw-accent) 45%, transparent);
 }
 .tw-prose p {
   font-size: 15px;
@@ -209,7 +234,7 @@ body {
   list-style: none;
   margin: 0;
   padding: 0 0 0 26px;
-  border-left: 1px solid var(--tw-border);
+  border-left: 1px solid color-mix(in srgb, var(--tw-accent-alt) 55%, transparent);
 }
 .tw-timeline__item { position: relative; padding: 0 0 34px 0; }
 .tw-timeline__item:last-child { padding-bottom: 0; }
@@ -221,8 +246,9 @@ body {
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: var(--tw-bg);
+  background: var(--tw-highlight);
   border: 2px solid var(--tw-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tw-accent-alt) 25%, transparent);
 }
 .tw-timeline__period {
   display: block !important;
@@ -261,8 +287,8 @@ body {
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--tw-muted);
-  background: var(--tw-surface-alt);
-  border: 1px solid var(--tw-border);
+  background: color-mix(in srgb, var(--tw-highlight) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tw-highlight) 90%, var(--tw-border));
   border-radius: 999px;
   padding: 4px 10px;
 }
@@ -277,11 +303,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: border-color 0.18s ease, transform 0.18s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .tw-project:hover {
-  border-color: color-mix(in srgb, var(--tw-accent) 55%, var(--tw-border));
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 var(--tw-highlight),
+    0 30px 60px -30px color-mix(in srgb, var(--tw-accent) 60%, transparent);
 }
 .tw-project__title {
   display: block !important;
@@ -306,30 +334,47 @@ body {
   color: var(--tw-accent);
   text-decoration: none;
 }
-.tw-project__link:hover { color: var(--tw-accent-alt); }
+.tw-project__link:hover { color: var(--tw-text); }
 
 /* ---------- Contact ---------- */
+/* The one deep moment on the page: the glass card fades from white into the
+   accent navy, and the links sit on that band as round glass buttons. */
+.tw-contact .tw-card {
+  padding-bottom: 34px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tw-highlight) 82%, transparent) 0%,
+    color-mix(in srgb, var(--tw-surface) 60%, transparent) 30%,
+    color-mix(in srgb, var(--tw-accent) 70%, var(--tw-accent-alt)) 72%,
+    var(--tw-accent) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--tw-highlight),
+    0 30px 60px -30px color-mix(in srgb, var(--tw-accent) 70%, transparent);
+}
 .tw-contact__intro {
   display: block !important;
   font-size: 15px;
   line-height: 1.74;
   color: var(--tw-muted);
-  margin: 0 0 20px;
+  margin: 0 0 72px;
 }
 .tw-contact__links { display: flex; flex-wrap: wrap; gap: 10px; }
 .tw-contact__link {
   font-size: 13.5px;
   font-weight: 500;
-  color: var(--tw-text);
+  color: var(--tw-highlight);
   text-decoration: none;
-  border: 1px solid var(--tw-border);
-  border-radius: 10px;
-  padding: 10px 18px;
-  transition: border-color 0.18s ease, color 0.18s ease;
+  background: color-mix(in srgb, var(--tw-highlight) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tw-highlight) 38%, transparent);
+  border-radius: 999px;
+  padding: 10px 20px;
+  backdrop-filter: blur(10px);
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 .tw-contact__link:hover {
-  color: var(--tw-accent);
-  border-color: color-mix(in srgb, var(--tw-accent) 55%, var(--tw-border));
+  background: color-mix(in srgb, var(--tw-highlight) 26%, transparent);
+  border-color: color-mix(in srgb, var(--tw-highlight) 60%, transparent);
 }
 
 /* ---------- Footer ---------- */
@@ -359,11 +404,15 @@ body {
   display: flex !important;
   flex-direction: column !important;
   gap: 0 !important;
-  background: var(--tw-surface) !important;
-  border: 1px solid var(--tw-border) !important;
-  border-radius: 16px !important;
+  background: color-mix(in srgb, var(--tw-surface) 80%, transparent) !important;
+  border: 1px solid var(--tw-highlight) !important;
+  border-radius: 24px !important;
   overflow: hidden;
-  box-shadow: 0 30px 70px -24px rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 var(--tw-highlight),
+    0 34px 80px -30px color-mix(in srgb, var(--tw-accent) 60%, transparent);
 }
 /* While dragging, suppress transitions and text selection so the drag reads
    as a direct manipulation rather than a lagging animation. */
@@ -411,7 +460,7 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
   cursor: nwse-resize;
   border-top: 2px solid transparent;
   border-left: 2px solid transparent;
-  border-top-left-radius: 16px;
+  border-top-left-radius: 24px;
   transition: border-color 0.15s ease;
 }
 #twin-panel:hover .tw-panel__grip--corner {
@@ -424,8 +473,8 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px 14px 20px;
-  border-bottom: 1px solid var(--tw-border);
+  padding: 16px 16px 14px 22px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tw-highlight) 70%, var(--tw-border));
   cursor: pointer;
 }
 #twin-panel.tw-collapsed .tw-panel__head { border-bottom: 0; }
@@ -454,13 +503,13 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
   justify-content: center;
   background: none;
   border: 0;
-  border-radius: 7px;
+  border-radius: 999px;
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease;
 }
 .tw-panel__toggle:hover, .tw-panel__expand:hover {
   color: var(--tw-text) !important;
-  background: var(--tw-surface-alt) !important;
+  background: var(--tw-highlight) !important;
 }
 /* Gradio wraps gr.HTML content in its own prose styles and colours the text
    with an !important rule of its own; these ids raise specificity enough to
@@ -520,13 +569,27 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
 #twin-panel .message,
 #twin-panel .message-bubble,
 #twin-panel .bubble {
-  background: var(--tw-surface-alt) !important;
+  background: var(--tw-highlight) !important;
   color: var(--tw-text) !important;
-  border: 1px solid var(--tw-border) !important;
-  border-radius: 12px !important;
+  border: 1px solid color-mix(in srgb, var(--tw-highlight) 60%, var(--tw-border)) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 20px -16px color-mix(in srgb, var(--tw-accent) 50%, transparent) !important;
   font-size: 13.5px !important;
   line-height: 1.62 !important;
   padding: 10px 13px !important;
+}
+/* Gradio nests a bubble three deep (.message-row.bubble > .message >
+   .message). All three match the rule above; with a shadow on each the answer
+   read as a card inside a card. Only the innermost one keeps the bubble look. */
+#twin-panel .message-row.bubble,
+#twin-panel .message:has(> .message) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+#twin-panel .user-row .message:not(:has(> .message)) {
+  background: color-mix(in srgb, var(--tw-accent-alt) 22%, var(--tw-highlight)) !important;
 }
 #twin-panel .message p, #twin-panel .prose p {
   font-size: 13.5px !important;
@@ -540,7 +603,7 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
 /* Only `p` used to be recoloured, so every other element the model's markdown
    produces — headings, `strong`, list items, blockquotes, table cells — kept
    Gradio's own prose colour, which is tuned for a light theme and renders
-   near-black on this near-black surface. That is why an answer showed a few
+   unevenly against this palette. That is why an answer showed a few
    readable paragraphs and the rest as barely-visible grey. Recolour the whole
    subtree, then restore the two things that are deliberately not body text. */
 #twin-panel .message,
@@ -562,7 +625,7 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
 }
 #twin-panel .message li { margin: 0 0 4px !important; }
 #twin-panel .message code, #twin-panel .message pre {
-  background: var(--tw-bg) !important;
+  background: var(--tw-surface-alt) !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 12px !important;
 }
@@ -603,13 +666,14 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
    above, whichever hide class this Gradio version applies. */
 .tw-examples.hide, .tw-examples.hidden { display: none !important; }
 .tw-examples button {
+  justify-content: flex-start !important;
   text-align: left !important;
   font-size: 12.5px !important;
   color: var(--tw-muted) !important;
-  background: var(--tw-surface-alt) !important;
-  border: 1px solid var(--tw-border) !important;
-  border-radius: 10px !important;
-  padding: 9px 12px !important;
+  background: color-mix(in srgb, var(--tw-highlight) 75%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--tw-highlight) 80%, var(--tw-border)) !important;
+  border-radius: 14px !important;
+  padding: 9px 13px !important;
   min-height: 0 !important;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
@@ -618,44 +682,83 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
   border-color: color-mix(in srgb, var(--tw-accent) 55%, var(--tw-border)) !important;
 }
 
-.tw-composer { flex: 0 0 auto; padding: 10px 12px 12px; gap: 8px !important; }
-#twin-panel textarea, #twin-panel input[type="text"] {
-  background: var(--tw-bg) !important;
+/* ---------- Composer ---------- */
+/* One rounded glass bar: the textarea fills it and the Send pill sits inside
+   on the right, bottom-aligned so it stays put as the input grows. The bar
+   (not the textarea) carries the border and focus ring. Gradio gives every
+   scaled child `min-width: min(160px, 100%)` and lets rows wrap; both are
+   overridden or the button drops below the input in a narrow panel. */
+#twin-panel .tw-composer {
+  flex: 0 0 auto;
+  flex-wrap: nowrap !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+  /* Gradio rows are `width: 100%`; with side margins that overflows the panel. */
+  width: auto !important;
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 6px 12px 12px !important;
+  padding: 5px !important;
+  background: var(--tw-highlight) !important;
   border: 1px solid var(--tw-border) !important;
-  border-radius: 10px !important;
+  border-radius: 22px !important;
+  box-shadow: 0 10px 26px -18px color-mix(in srgb, var(--tw-accent) 55%, transparent);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#twin-panel .tw-composer:focus-within {
+  border-color: color-mix(in srgb, var(--tw-accent) 55%, var(--tw-border)) !important;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--tw-accent-alt) 28%, transparent),
+    0 10px 26px -18px color-mix(in srgb, var(--tw-accent) 55%, transparent);
+}
+#twin-panel .tw-composer > *:not(.tw-send) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+#twin-panel textarea, #twin-panel input[type="text"] {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   color: var(--tw-text) !important;
   font-family: 'Inter', sans-serif !important;
   font-size: 13.5px !important;
-  padding: 10px 12px !important;
-  min-height: 42px !important;
+  line-height: 1.45 !important;
+  padding: 9px 10px !important;
+  min-height: 38px !important;
+  resize: none !important;
+  /* Gradio's autosize can measure before the panel has its width and stamp a
+     huge inline height; cap it so the composer never swallows the panel. */
+  max-height: 120px !important;
 }
-#twin-panel textarea:focus {
-  outline: none !important;
-  border-color: color-mix(in srgb, var(--tw-accent) 60%, var(--tw-border)) !important;
-  box-shadow: none !important;
-}
+#twin-panel textarea:focus { outline: none !important; box-shadow: none !important; }
 #twin-panel textarea::placeholder { color: var(--tw-muted) !important; }
 
-#twin-panel button.primary, #twin-panel .tw-send button, #twin-panel .tw-send {
+#twin-panel button.primary, #twin-panel .tw-send {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 18px !important;
   background: var(--tw-accent) !important;
-  border: 1px solid var(--tw-accent) !important;
-  border-radius: 10px !important;
-  color: var(--tw-bg) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  color: var(--tw-highlight) !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  min-height: 42px !important;
+  box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--tw-accent) 80%, transparent);
 }
 #twin-panel button.primary:hover, #twin-panel .tw-send:hover {
-  background: var(--tw-accent-alt) !important;
-  border-color: var(--tw-accent-alt) !important;
+  background: color-mix(in srgb, var(--tw-accent) 85%, var(--tw-text)) !important;
 }
 
 /* ---------- Scrollbar + selection ---------- */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--tw-border); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--tw-muted); }
-::selection { background: var(--tw-accent); color: var(--tw-bg); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--tw-accent-alt) 50%, transparent); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--tw-accent-alt); }
+::selection { background: var(--tw-accent); color: var(--tw-highlight); }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
@@ -695,7 +798,7 @@ body.tw-resizing-active { user-select: none !important; cursor: nwse-resize !imp
     bottom: 0;
     width: auto !important;
     max-width: none !important;
-    border-radius: 16px 16px 0 0;
+    border-radius: 24px 24px 0 0;
     height: clamp(260px, var(--tw-panel-h, 70dvh), 85dvh) !important;
     max-height: 85dvh !important;
   }
@@ -719,7 +822,6 @@ def build_css(theme: Theme) -> str:
         f"  --tw-{field.replace('_', '-')}: {value};"
         for field, value in theme.model_dump().items()
     ]
-    lines.append("  --tw-grid: color-mix(in srgb, var(--tw-accent) 5%, transparent);")
     root = ":root {\n" + "\n".join(lines) + "\n}\n"
     return root + CSS_TEMPLATE
 

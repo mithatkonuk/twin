@@ -31,18 +31,19 @@ def test_optional_sections_default_to_empty(tmp_path):
     assert profile.contact is None
 
 
-def test_theme_defaults_to_the_dark_palette(tmp_path):
+def test_theme_defaults_to_the_light_glass_palette(tmp_path):
     profile = load_profile(write(tmp_path, MINIMAL))
-    assert profile.theme.bg == "#0A0A0F"
-    assert profile.theme.accent == "#F0B429"
-    assert profile.theme.accent_alt == "#A855F7"
+    assert profile.theme.bg == "#E8EDF3"
+    assert profile.theme.text == "#1A2238"
+    assert profile.theme.accent == "#3C5A8A"
+    assert profile.theme.highlight == "#FFFFFF"
 
 
 def test_theme_field_can_be_overridden(tmp_path):
     data = {**MINIMAL, "theme": {"accent": "#FF0000"}}
     profile = load_profile(write(tmp_path, data))
     assert profile.theme.accent == "#FF0000"
-    assert profile.theme.bg == "#0A0A0F"
+    assert profile.theme.bg == "#E8EDF3"
 
 
 def test_journey_entry_is_parsed(tmp_path):

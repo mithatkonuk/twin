@@ -13,7 +13,7 @@ def test_every_theme_token_reaches_the_root_block():
 def test_overridden_token_is_used():
     css = build_css(Theme(accent="#FF0000"))
     assert "--tw-accent: #FF0000" in css
-    assert "--tw-accent: #F0B429" not in css
+    assert "--tw-accent: #3C5A8A" not in css
 
 
 def test_template_body_contains_no_palette_literals():

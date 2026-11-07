@@ -27,16 +27,22 @@ class Identity(BaseModel):
 
 
 class Theme(BaseModel):
-    """Palette tokens. Every field has a default, so `theme:` may be omitted."""
+    """Palette tokens. Every field has a default, so `theme:` may be omitted.
 
-    bg: str = "#0A0A0F"
-    surface: str = "#14141C"
-    surface_alt: str = "#1B1B25"
-    border: str = "#26262F"
-    text: str = "#ECECF1"
-    muted: str = "#7C7C8A"
-    accent: str = "#F0B429"
-    accent_alt: str = "#A855F7"
+    The default is a light, frosted-glass palette: a cool grey-blue page, white
+    glass cards, navy ink and a slate-blue accent that also drives the deep
+    gradient band. `highlight` is the glass tint and the text colour on that band.
+    """
+
+    bg: str = "#E8EDF3"
+    surface: str = "#F7F9FC"
+    surface_alt: str = "#EEF2F7"
+    border: str = "#D9E0EA"
+    text: str = "#1A2238"
+    muted: str = "#6E7890"
+    accent: str = "#3C5A8A"
+    accent_alt: str = "#8EA3C4"
+    highlight: str = "#FFFFFF"
 
 
 class JourneyEntry(BaseModel):

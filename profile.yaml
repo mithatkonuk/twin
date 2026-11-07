@@ -12,14 +12,15 @@ identity:
   photo: /gradio_api/file=assets/photo.jpg
 
 theme:
-  bg: "#0A0A0F"
-  surface: "#14141C"
-  surface_alt: "#1B1B25"
-  border: "#26262F"
-  text: "#ECECF1"
-  muted: "#7C7C8A"
-  accent: "#F0B429"
-  accent_alt: "#A855F7"
+  bg: "#E8EDF3"
+  surface: "#F7F9FC"
+  surface_alt: "#EEF2F7"
+  border: "#D9E0EA"
+  text: "#1A2238"
+  muted: "#6E7890"
+  accent: "#3C5A8A"
+  accent_alt: "#8EA3C4"
+  highlight: "#FFFFFF"
 
 about:
   - >-
